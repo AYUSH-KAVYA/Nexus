@@ -109,8 +109,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5001;
-if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+if (require.main === module) {
+  const PORT = process.env.PORT || 5001;
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Nexus Platform API running on port ${PORT} (Nexus + Signal unified)`);
   });
