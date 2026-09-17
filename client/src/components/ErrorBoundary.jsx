@@ -24,14 +24,24 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div className="min-h-[50vh] flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl p-6 text-center shadow-2xl backdrop-blur-xl">
+          <div className="max-w-xl w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl p-6 text-center shadow-2xl backdrop-blur-xl">
             <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-bold text-zinc-100 mb-1">Display Issue</h3>
-            <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
+            <p className="text-xs text-zinc-400 mb-4 leading-relaxed">
               An unexpected render issue occurred in this section. The application state remains intact.
             </p>
+
+            {this.state.error && (
+              <div className="mb-6 p-3 bg-zinc-950 rounded-xl border border-rose-900/50 text-left font-mono text-[11px] text-rose-300 overflow-x-auto max-h-40">
+                <div className="font-bold text-rose-400 mb-1">Error: {this.state.error.toString()}</div>
+                {this.state.error.stack && (
+                  <pre className="text-[10px] text-zinc-500 whitespace-pre-wrap">{this.state.error.stack}</pre>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-3 justify-center">
               <button
                 onClick={this.handleReset}

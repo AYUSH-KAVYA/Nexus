@@ -18,15 +18,27 @@ const Home = () => {
     const fetchProjects = async () => {
       try {
         const { data } = await client.get('/projects');
-        setProjects(data);
+        setProjects(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error('Failed to load projects', err);
+        setProjects([]);
       } finally {
         setLoading(false);
       }
     };
     fetchProjects();
   }, []);
+
+  const safeFormatTime = (dateStr) => {
+    try {
+      if (!dateStr) return 'New';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return 'New';
+      return formatDistanceToNow(d);
+    } catch {
+      return 'New';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -87,7 +99,7 @@ const Home = () => {
                 </div>
                 <div className="flex items-center text-zinc-500 font-mono text-[11px]">
                   <Clock className="w-3 h-3 mr-1" />
-                  {project.last_activity || project.created_at ? formatDistanceToNow(new Date(project.last_activity || project.created_at)) : 'New'}
+                  {safeFormatTime(project.last_activity || project.created_at)}
                 </div>
               </div>
             </Card>
