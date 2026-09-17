@@ -1,11 +1,12 @@
 const { Pool } = require('pg');
 
-const isCloudDb = process.env.NODE_ENV === 'production' || 
-                  process.env.VERCEL || 
-                  (process.env.DATABASE_URL && (process.env.DATABASE_URL.includes('neon.tech') || process.env.DATABASE_URL.includes('aws')));
+const DEFAULT_NEON_URL = 'postgresql://neondb_owner:npg_bTxGUCRW81Yn@ep-floral-forest-aztubiqy-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require';
+
+const connectionString = process.env.DATABASE_URL || DEFAULT_NEON_URL;
+const isCloudDb = connectionString.includes('neon.tech') || connectionString.includes('aws') || process.env.NODE_ENV === 'production' || process.env.VERCEL;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/nexus',
+  connectionString,
   ssl: isCloudDb ? { rejectUnauthorized: false } : false
 });
 
