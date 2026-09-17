@@ -40,9 +40,10 @@ router.post('/signup', catchAsync(async (req, res, next) => {
   const salt = await bcrypt.genSalt(10);
   const passwordHash = await bcrypt.hash(password, salt);
 
+  const defaultOrgId = '00000000-0000-0000-0000-000000000001';
   const { rows } = await pool.query(
-    'INSERT INTO users (name, email, password_hash, global_role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, global_role, organization_id',
-    [name, email, passwordHash, globalRole]
+    'INSERT INTO users (name, email, password_hash, global_role, organization_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, name, email, global_role, organization_id',
+    [name, email, passwordHash, globalRole, defaultOrgId]
   );
   
   const user = rows[0];
