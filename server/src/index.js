@@ -65,32 +65,30 @@ app.get('/api/health', (req, res) => {
 // ══════════════════════════════════════════════════════════════
 // PLATFORM ROUTES — no entitlement, available to any authed user
 // ══════════════════════════════════════════════════════════════
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/projects/:projectId/stakeholders', stakeholderRoutes);
-app.use('/api/alerts', alertRoutes);
-app.use('/api/organizations', organizationRoutes);
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/projects', '/projects'], projectRoutes);
+app.use(['/api/projects/:projectId/stakeholders', '/projects/:projectId/stakeholders'], stakeholderRoutes);
+app.use(['/api/alerts', '/alerts'], alertRoutes);
+app.use(['/api/organizations', '/organizations'], organizationRoutes);
 
 // ══════════════════════════════════════════════════════════════
 // NEXUS APP ROUTES — require 'nexus' entitlement
-// (authenticate is called per-route inside these routers)
 // ══════════════════════════════════════════════════════════════
 const nexusEntitlement = [authenticate, requireAppEntitlement('nexus')];
-app.use('/api/projects/:projectId/tasks', nexusEntitlement, taskRoutes);
-app.use('/api/projects/:projectId/dependencies', nexusEntitlement, dependencyRoutes);
-app.use('/api/projects/:projectId/approvals', nexusEntitlement, approvalRoutes);
-app.use('/api/projects/:projectId/changes', nexusEntitlement, changeRoutes);
-app.use('/api/projects/:projectId/impact', nexusEntitlement, impactRoutes);
-app.use('/api/projects/:projectId/bottleneck', nexusEntitlement, bottleneckRoutes);
+app.use(['/api/projects/:projectId/tasks', '/projects/:projectId/tasks'], nexusEntitlement, taskRoutes);
+app.use(['/api/projects/:projectId/dependencies', '/projects/:projectId/dependencies'], nexusEntitlement, dependencyRoutes);
+app.use(['/api/projects/:projectId/approvals', '/projects/:projectId/approvals'], nexusEntitlement, approvalRoutes);
+app.use(['/api/projects/:projectId/changes', '/projects/:projectId/changes'], nexusEntitlement, changeRoutes);
+app.use(['/api/projects/:projectId/impact', '/projects/:projectId/impact'], nexusEntitlement, impactRoutes);
+app.use(['/api/projects/:projectId/bottleneck', '/projects/:projectId/bottleneck'], nexusEntitlement, bottleneckRoutes);
 
 // ══════════════════════════════════════════════════════════════
 // NEXUS SIGNAL ROUTES — require 'nexus_signal' entitlement
-// (authenticate applied here since Signal routes had no auth)
 // ══════════════════════════════════════════════════════════════
 const signalEntitlement = [authenticate, requireAppEntitlement('nexus_signal')];
-app.use('/api/conversations', signalEntitlement, signalConversationsRoutes);
-app.use('/api/items', signalEntitlement, signalItemsRoutes);
-app.use('/api/demo', signalDemoRoutes);
+app.use(['/api/conversations', '/conversations'], signalEntitlement, signalConversationsRoutes);
+app.use(['/api/items', '/items'], signalEntitlement, signalItemsRoutes);
+app.use(['/api/demo', '/demo'], signalDemoRoutes);
 
 // ── 404 catch-all ────────────────────────────────────────────
 app.all('*', (req, res, next) => {
