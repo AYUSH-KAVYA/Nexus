@@ -98,7 +98,75 @@ Nexus Core subscribes to these domain events and automatically triggers the **Im
 
 ---
 
-## 4. Database Schema Overview
+## 4. How to Use the App's Core Functionality
+
+### 4.1 System Sign In & Demo Accounts
+1. Launch the web application.
+2. Select one of the pre-configured demo user cards or log in directly (all passwords: `password123`):
+
+| User | Email | Role | Entitlements |
+|---|---|---|---|
+| **Sarah Chen** | `sarah@nexus.dev` | Admin | Nexus Core + Nexus Signal |
+| **Mike Rodriguez** | `mike@nexus.dev` | Project Manager | Nexus Core + Nexus Signal |
+| **Priya Patel** | `priya@nexus.dev` | Subcontractor | Nexus Core + Nexus Signal |
+| **Alex Turner** | `alex@studiosolo.dev` | Admin | Nexus Core Only (Signal Disabled) |
+
+---
+
+### 4.2 Managing Projects & Task Dependencies (Nexus Core)
+1. **View Active Workspaces**: On the Home Dashboard, click on a project (e.g. *"Whitfield Residence — Complete Interior Redesign"*).
+2. **Interactive Task Board**: Tasks are categorized into 4 interactive status tiles: **Not Started**, **In Progress**, **Blocked**, and **Complete**.
+3. **Upstream Dependency Warnings**: Tasks with incomplete upstream prerequisites display amber dependency alerts. Hovering over the task details displays the blocking task title and assigned subcontractor.
+4. **Create a Task**: Click `+ New Task`, fill in the title, description, assigned subcontractor, duration, and select any upstream prerequisite tasks to establish graph edges.
+
+---
+
+### 4.3 Triggering a Change & Analyzing Blast Radius Impact
+1. Inside a project workspace, click **`Propose Change`** (`/projects/:id/changes/new`).
+2. Select the affected task (e.g., *"Custom Millwork Installation"*) and type a change description (e.g., *"3-day material shipment delay from supplier"*).
+3. Click **`Preview Impact`**:
+   - The **Impact Engine** runs depth-first DAG graph traversal.
+   - Displays the **Blast Radius Score** (Low, Medium, High).
+   - Renders the interactive **Impact Tree**, displaying all downstream tasks affected and any downstream approval gates that will be forced open.
+4. Click **`Commit Change`** (as Admin/PM) or **`Submit for Review`** (as Client).
+5. Downstream PMs receive notification in **Pending Approvals** (`/projects/:id/approvals`) to review and accept the delay adjustment.
+
+---
+
+### 4.4 Capturing AI Conversation Intelligence (Nexus Signal)
+1. In the sidebar, click **`Signal AI Capture`** (`/signal`).
+2. Paste a meeting transcript, phone call summary, site inspection note, or Slack thread into the text area (or select a pre-populated sample script).
+3. Select the target project and click **`Extract Intelligence`**.
+4. **Multi-Pass AI Pipeline**:
+   - Gemini & Groq extract candidate action items, decisions, and risk flags.
+   - Runs fuzzy Levenshtein matching against active project tasks.
+5. **Review Screen**: View extracted items alongside original source transcript highlights.
+6. Click **`Confirm Item`**:
+   - Updates the task status or project memory in Nexus Core.
+   - Emits a `CONVERSATION_ITEM_CONFIRMED` domain event.
+   - Adds a `📩 from conversation` badge to the linked task card on the Task Board.
+
+---
+
+### 4.5 Inspecting Real-Time Cross-App Domain Events
+1. In the sidebar, click **`Domain Events`** (`/events`).
+2. Displays the live audit trail of cross-app events emitted across Nexus Core, Nexus Signal, and shared platform services.
+3. Observe live event cards showing event type (`CONVERSATION_ITEM_CONFIRMED`, `IMPACT_ENGINE_TRIGGERED`, `CHANGE_COMMITTED`), blast radius scores, and source app badges.
+
+---
+
+### 4.6 Toggling App Entitlements (Admin Control)
+1. Log in as an Admin (`sarah@nexus.dev` or `alex@studiosolo.dev`).
+2. In the sidebar, click **`Organization Settings`** (`/settings/organization`).
+3. Toggle **Nexus Signal** ON or OFF.
+4. **Result**:
+   - The database updates `organization_apps`.
+   - The navigation sidebar immediately updates (hiding or showing Signal AI Capture).
+   - Attempting to access Signal routes directly for a disabled org returns HTTP 403 Forbidden.
+
+---
+
+## 5. Database Schema Overview
 
 ```sql
 -- Shared Platform Schema
@@ -127,7 +195,7 @@ CREATE TABLE domain_events (
 
 ---
 
-## 5. Cloud Deployment & Serverless Architecture
+## 6. Cloud Deployment & Serverless Architecture
 
 - **Vercel Serverless Function Wrapper**: `/api/index.js` wraps the Express application in an explicit handler:
   ```javascript
@@ -138,7 +206,7 @@ CREATE TABLE domain_events (
 
 ---
 
-## 6. Future Expansion & Vision: "What I Would Implement Next"
+## 7. Future Expansion & Vision: "What I Would Implement Next"
 
 If granted additional development time, the platform would evolve into a **Universal Enterprise SaaS Intelligence Fabric**, uniting multiple vertical SaaS platforms (Construction, CRM, ERP, Supply Chain, and Procurement) under a single cognitive AI layer.
 
@@ -159,22 +227,22 @@ If granted additional development time, the platform would evolve into a **Unive
 └────────┘    └────────┘    └────────┘    └────────────┘  └───────────┘  └───────────┘
 ```
 
-### 6.1 Unifying Additional SaaS Platforms Under One Fabric
+### 7.1 Unifying Additional SaaS Platforms Under One Fabric
 - **Nexus CRM Integration**: Auto-create project workspaces directly from won sales deals in Salesforce or Hubspot. Automatically sync client communication logs to project timelines.
 - **Nexus Supply Chain & Logistics**: Track raw material lead times (e.g., custom marble, HVAC units) directly from supplier APIs. If a shipping vessel or manufacturer delays shipment, the Impact Engine automatically recalculates on-site construction schedules weeks in advance.
 - **Nexus Financial & ERP Sync**: Link change requests and blast radius scores directly to budget impact models in QuickBooks or SAP, predicting cost overruns before purchase orders are issued.
 
-### 6.2 Universal Knowledge Graph & Enterprise Semantic Memory
+### 7.2 Universal Knowledge Graph & Enterprise Semantic Memory
 - **Unified Graph Database (Neo4j / PG-Vector)**: Connect transcripts, CAD blueprints, RFIs, invoices, and Slack threads into a single querying graph.
 - **Cross-App Contextual Search**: Ask natural language questions like *"Why was the marble installation delayed in Project Whitfield?"* and receive a synthesized answer referencing the original phone call transcript, the affected task, and the approved change order.
 
-### 6.3 Multi-Modal AI Meeting & Visual Blueprint Intelligence
+### 7.3 Multi-Modal AI Meeting & Visual Blueprint Intelligence
 - **Audio & CAD Visual Analysis**: Extend Signal AI to parse audio/video recordings directly alongside PDF architectural blueprints. The AI will compare site walkthrough videos against floor plans to automatically detect out-of-spec installations.
 
-### 6.4 Autonomous AI Roadmap & GANTT Generation
+### 7.4 Autonomous AI Roadmap & GANTT Generation
 - **Self-Healing Roadmaps**: Dynamically construct and adjust Critical Path Method (CPM) project roadmaps directly from team Slack threads, WhatsApp messages, and email threads without manual PM data entry.
 
-### 6.5 Proactive AI Risk Suggestions & Anomaly Agents
+### 7.5 Proactive AI Risk Suggestions & Anomaly Agents
 - **Autonomous Risk Agents**: Background agents continuously analyzing domain events to predict contractor default risk, supply chain bottlenecks, and safety compliance failures before they occur on-site.
 
 ---
