@@ -7,9 +7,9 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-const signToken = (userId, email, globalRole) => {
+const signToken = (userId, email, globalRole, organizationId) => {
   return jwt.sign(
-    { userId, email, globalRole },
+    { userId, email, globalRole, organizationId },
     process.env.JWT_SECRET,
     { expiresIn: '7d' }
   );
@@ -40,19 +40,20 @@ router.post('/signup', catchAsync(async (req, res, next) => {
   const passwordHash = await bcrypt.hash(password, salt);
 
   const { rows } = await pool.query(
-    'INSERT INTO users (name, email, password_hash, global_role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, global_role',
+    'INSERT INTO users (name, email, password_hash, global_role) VALUES ($1, $2, $3, $4) RETURNING id, name, email, global_role, organization_id',
     [name, email, passwordHash, globalRole]
   );
   
   const user = rows[0];
-  const token = signToken(user.id, user.email, user.global_role);
+  const token = signToken(user.id, user.email, user.global_role, user.organization_id);
 
   res.status(201).json({
     user: {
       id: user.id,
       name: user.name,
       email: user.email,
-      globalRole: user.global_role
+      globalRole: user.global_role,
+      organizationId: user.organization_id
     },
     token
   });
@@ -65,7 +66,13 @@ router.post('/login', catchAsync(async (req, res, next) => {
     return next(new AppError('Please provide email and password', 400));
   }
 
-  const { rows } = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+  const { rows } = await pool.query(
+    `SELECT u.*, o.name as organization_name
+     FROM users u
+     LEFT JOIN organizations o ON o.id = u.organization_id
+     WHERE u.email = $1`,
+    [email]
+  );
   const user = rows[0];
 
   if (!user) {
@@ -77,14 +84,16 @@ router.post('/login', catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user.id, user.email, user.global_role);
+  const token = signToken(user.id, user.email, user.global_role, user.organization_id);
 
   res.status(200).json({
     user: {
       id: user.id,
       name: user.name,
       email: user.email,
-      globalRole: user.global_role
+      globalRole: user.global_role,
+      organizationId: user.organization_id,
+      organizationName: user.organization_name
     },
     token
   });

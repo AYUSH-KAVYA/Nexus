@@ -5,7 +5,7 @@ const { authenticate } = require('../middleware/auth');
 const { requireGlobalRole, requireProjectMembership } = require('../middleware/rbac');
 const { catchAsync } = require('../utils/errors');
 
-// GET /
+// GET / — scoped to user's organization for multi-tenant isolation
 router.get('/', authenticate, catchAsync(async (req, res) => {
   let query = `
     SELECT p.id, p.name, p.description, p.created_at,
@@ -16,11 +16,12 @@ router.get('/', authenticate, catchAsync(async (req, res) => {
     LEFT JOIN stakeholders s ON p.id = s.project_id
     LEFT JOIN tasks t ON p.id = t.project_id
     LEFT JOIN changes c ON p.id = c.project_id
+    WHERE p.organization_id = $1
   `;
-  const queryParams = [];
+  const queryParams = [req.user.organizationId];
 
   if (req.user.globalRole !== 'admin') {
-    query += ` WHERE p.id IN (SELECT project_id FROM stakeholders WHERE user_id = $1) `;
+    query += ` AND p.id IN (SELECT project_id FROM stakeholders WHERE user_id = $2) `;
     queryParams.push(req.user.id);
   }
 
@@ -30,12 +31,12 @@ router.get('/', authenticate, catchAsync(async (req, res) => {
   res.json(result.rows);
 }));
 
-// POST /
+// POST / — assigns project to user's organization
 router.post('/', authenticate, requireGlobalRole('admin'), catchAsync(async (req, res) => {
   const { name, description } = req.body;
   const result = await pool.query(
-    'INSERT INTO projects (name, description, created_by) VALUES ($1, $2, $3) RETURNING *',
-    [name, description, req.user.id]
+    'INSERT INTO projects (name, description, created_by, organization_id) VALUES ($1, $2, $3, $4) RETURNING *',
+    [name, description, req.user.id, req.user.organizationId]
   );
   res.status(201).json(result.rows[0]);
 }));

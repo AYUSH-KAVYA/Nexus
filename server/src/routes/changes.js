@@ -86,6 +86,25 @@ router.post('/', authenticate, requireProjectMembership(), catchAsync(async (req
           );
         }
       }
+
+      // AS-06: Log domain event for committed change
+      if (req.user?.organizationId) {
+        await client.query(
+          `INSERT INTO domain_events (organization_id, event_type, source_app, payload)
+           VALUES ($1, 'CHANGE_COMMITTED', 'nexus', $2)`,
+          [
+            req.user.organizationId,
+            JSON.stringify({
+              change_id: change.id,
+              project_id: projectId,
+              task_id: taskId,
+              description,
+              blast_radius_score: impact?.blastRadiusScore || 0,
+              blast_radius_level: impact?.blastRadiusLevel || 'low'
+            })
+          ]
+        );
+      }
     }
 
     await client.query('COMMIT');
@@ -148,6 +167,26 @@ router.post('/:changeId/approve', authenticate, requireProjectAccess('pm'), catc
       `INSERT INTO alerts (stakeholder_id, change_id, message) VALUES ($1, $2, $3)`,
       [change.proposed_by, changeId, `Your proposed change to "${change.task_title}" has been approved`]
     );
+
+    // AS-06: Log domain event for approved committed change
+    if (req.user?.organizationId) {
+      await client.query(
+        `INSERT INTO domain_events (organization_id, event_type, source_app, payload)
+         VALUES ($1, 'CHANGE_COMMITTED', 'nexus', $2)`,
+        [
+          req.user.organizationId,
+          JSON.stringify({
+            change_id: changeId,
+            project_id: projectId,
+            task_id: change.task_id,
+            description: change.description,
+            reviewed_by: req.stakeholder.id,
+            blast_radius_score: impact?.blastRadiusScore || 0,
+            blast_radius_level: impact?.blastRadiusLevel || 'low'
+          })
+        ]
+      );
+    }
 
     await client.query('COMMIT');
     

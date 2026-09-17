@@ -17,7 +17,14 @@ const authenticate = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const { rows } = await pool.query('SELECT id, name, email, global_role FROM users WHERE id = $1', [decoded.userId]);
+    const { rows } = await pool.query(
+      `SELECT u.id, u.name, u.email, u.global_role, u.organization_id,
+              o.name as organization_name
+       FROM users u
+       LEFT JOIN organizations o ON o.id = u.organization_id
+       WHERE u.id = $1`,
+      [decoded.userId]
+    );
     const user = rows[0];
 
     if (!user) {
@@ -28,7 +35,9 @@ const authenticate = async (req, res, next) => {
       id: user.id,
       name: user.name,
       email: user.email,
-      globalRole: user.global_role
+      globalRole: user.global_role,
+      organizationId: user.organization_id,
+      organizationName: user.organization_name
     };
     next();
   } catch (error) {

@@ -31,15 +31,15 @@ const Login = () => {
 
   const demoUsers = [
     {
-      role: 'Admin / Principal Architect',
+      role: 'Admin · Whitfield (Both Apps)',
       name: 'Sarah Chen',
       email: 'sarah@nexus.dev',
-      desc: 'Full workspace configuration, permissions, direct commit power',
+      desc: 'Whitfield Interiors — Full Nexus + Nexus Signal AI suite',
       badge: 'admin',
       color: 'border-amber-500/40 bg-amber-950/30 text-amber-200'
     },
     {
-      role: 'Project Manager',
+      role: 'Project Manager · Whitfield',
       name: 'Mike Rodriguez',
       email: 'mike@nexus.dev',
       desc: 'Task scheduling, dependency control & change approval queue',
@@ -47,12 +47,20 @@ const Login = () => {
       color: 'border-zinc-500/40 bg-zinc-800/40 text-zinc-200'
     },
     {
-      role: 'Client Stakeholder',
+      role: 'Client · Whitfield',
       name: 'Priya Patel',
       email: 'priya@nexus.dev',
       desc: 'View status, milestones & submit structured change requests',
       badge: 'client',
       color: 'border-emerald-500/40 bg-emerald-950/30 text-emerald-200'
+    },
+    {
+      role: 'Admin · Studio Solo (Nexus Only)',
+      name: 'Alex Turner',
+      email: 'alex@studiosolo.dev',
+      desc: 'Studio Solo — Modular tenant with only Nexus Core enabled',
+      badge: 'solo-org',
+      color: 'border-sky-500/40 bg-sky-950/30 text-sky-200'
     }
   ];
 

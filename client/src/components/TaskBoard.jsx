@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Badge } from './ui';
 import { Clock, AlertOctagon, CheckCircle2, ChevronDown, ChevronUp, Link2, FileText } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
 
 export default function TaskBoard({ tasks = [], projectId, onTaskClick }) {
+  const { hasApp } = useAuth();
   const [activeStatus, setActiveStatus] = useState('pending');
   const [expandedTaskIds, setExpandedTaskIds] = useState(new Set());
 
@@ -168,6 +170,13 @@ export default function TaskBoard({ tasks = [], projectId, onTaskClick }) {
                       {incomingDeps > 0 && (
                         <span className="text-[10px] font-mono px-2 py-0.5 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-300 flex items-center gap-1">
                           <Link2 className="w-3 h-3" /> {incomingDeps} upstream
+                        </span>
+                      )}
+
+                      {/* AS-06: Task badge conditional on nexus_signal entitlement */}
+                      {task.source_conversation_id && hasApp('nexus_signal') && (
+                        <span className="text-[10px] font-medium bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          📩 from conversation
                         </span>
                       )}
 

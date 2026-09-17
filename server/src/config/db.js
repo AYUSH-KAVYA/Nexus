@@ -15,4 +15,6 @@ pool.query('SELECT 1', (err, res) => {
   }
 });
 
+pool.pool = pool;
+
 module.exports = pool;

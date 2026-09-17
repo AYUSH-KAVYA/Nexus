@@ -1,3 +1,12 @@
+-- AS-06: Full demo seed data
+-- Password for all users: password123
+
+-- Clean in FK order
+DELETE FROM domain_events;
+DELETE FROM organization_apps;
+DELETE FROM extracted_items;
+DELETE FROM extraction_runs;
+DELETE FROM conversations;
 DELETE FROM alerts;
 DELETE FROM changes;
 DELETE FROM approvals;
@@ -6,18 +15,42 @@ DELETE FROM tasks;
 DELETE FROM stakeholders;
 DELETE FROM projects;
 DELETE FROM users;
+DELETE FROM organizations;
 
--- Users
-INSERT INTO users (id, name, email, password_hash, global_role) VALUES
-('00000000-0000-0000-0000-000000000001', 'Sarah Chen', 'sarah@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'admin'),
-('00000000-0000-0000-0000-000000000002', 'Mike Rodriguez', 'mike@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'pm'),
-('00000000-0000-0000-0000-000000000003', 'Priya Patel', 'priya@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'stakeholder');
+-- ============================================================
+-- ORGANIZATIONS
+-- ============================================================
+INSERT INTO organizations (id, name) VALUES
+('a0000000-0000-0000-0000-000000000001', 'Whitfield Interiors'),
+('a0000000-0000-0000-0000-000000000002', 'Studio Solo');
 
--- Project
-INSERT INTO projects (id, name, description, created_by) VALUES
-('10000000-0000-0000-0000-000000000001', 'Whitfield Residence — Complete Interior Redesign', 'Full interior redesign of a 4,200 sq ft residential property. Scope includes living room, kitchen, master bedroom, two bathrooms, and home office. Timeline: 16 weeks.', '00000000-0000-0000-0000-000000000001');
+-- ============================================================
+-- ORGANIZATION APPS (ENTITLEMENTS)
+-- ============================================================
+INSERT INTO organization_apps (organization_id, app_name, enabled) VALUES
+('a0000000-0000-0000-0000-000000000001', 'nexus', true),
+('a0000000-0000-0000-0000-000000000001', 'nexus_signal', true),
+('a0000000-0000-0000-0000-000000000002', 'nexus', true);
 
--- Stakeholders
+-- ============================================================
+-- USERS
+-- ============================================================
+INSERT INTO users (id, name, email, password_hash, global_role, organization_id) VALUES
+('00000000-0000-0000-0000-000000000001', 'Sarah Chen', 'sarah@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'admin', 'a0000000-0000-0000-0000-000000000001'),
+('00000000-0000-0000-0000-000000000002', 'Mike Rodriguez', 'mike@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'pm', 'a0000000-0000-0000-0000-000000000001'),
+('00000000-0000-0000-0000-000000000003', 'Priya Patel', 'priya@nexus.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'stakeholder', 'a0000000-0000-0000-0000-000000000001'),
+('00000000-0000-0000-0000-000000000004', 'Alex Turner', 'alex@studiosolo.dev', '$2a$10$M61M.1hSAgaSloAZrL/fNe8.RV9W/VKZ7yf2gVsVOVmDsvhIfNW6G', 'admin', 'a0000000-0000-0000-0000-000000000002');
+
+-- ============================================================
+-- PROJECTS
+-- ============================================================
+INSERT INTO projects (id, name, description, created_by, organization_id) VALUES
+('10000000-0000-0000-0000-000000000001', 'Whitfield Residence — Complete Interior Redesign', 'Full interior redesign of a 4,200 sq ft residential property. Scope includes living room, kitchen, master bedroom, two bathrooms, and home office. Timeline: 16 weeks.', '00000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001'),
+('10000000-0000-0000-0000-000000000002', 'Modern Loft — Kitchen Remodel', 'Compact kitchen remodel for a downtown loft. Scope: cabinetry, countertops, lighting, and appliance layout. Timeline: 6 weeks.', '00000000-0000-0000-0000-000000000004', 'a0000000-0000-0000-0000-000000000002');
+
+-- ============================================================
+-- STAKEHOLDERS — Whitfield Interiors
+-- ============================================================
 INSERT INTO stakeholders (id, project_id, user_id, name, email, role, access_level) VALUES
 ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Sarah Chen', 'sarah@nexus.dev', 'PM', 'admin'),
 ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002', 'Mike Rodriguez', 'mike@nexus.dev', 'PM', 'pm'),
@@ -34,7 +67,17 @@ INSERT INTO stakeholders (id, project_id, user_id, name, email, role, access_lev
 ('20000000-0000-0000-0000-000000000013', '10000000-0000-0000-0000-000000000001', NULL, 'Nina Kozlov', 'nina@example.com', 'Lighting Vendor', 'view_only'),
 ('20000000-0000-0000-0000-000000000014', '10000000-0000-0000-0000-000000000001', NULL, 'Robert Blake', 'robert@example.com', 'Compliance Officer', 'view_only');
 
--- Tasks
+-- ============================================================
+-- STAKEHOLDERS — Studio Solo
+-- ============================================================
+INSERT INTO stakeholders (id, project_id, user_id, name, email, role, access_level) VALUES
+('20000000-0000-0000-0000-000000000101', '10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000004', 'Alex Turner', 'alex@studiosolo.dev', 'Owner / PM', 'admin'),
+('20000000-0000-0000-0000-000000000102', '10000000-0000-0000-0000-000000000002', NULL, 'Jordan Lee', 'jordan@example.com', 'Cabinet Maker', 'view_only'),
+('20000000-0000-0000-0000-000000000103', '10000000-0000-0000-0000-000000000002', NULL, 'Sam Rivera', 'sam@example.com', 'Electrician', 'view_only');
+
+-- ============================================================
+-- TASKS — Whitfield (same 17 tasks as original)
+-- ============================================================
 INSERT INTO tasks (id, project_id, title, description, status, owner_id, tags) VALUES
 ('30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Finalize Floor Plan Layout', '', 'done', '20000000-0000-0000-0000-000000000004', '{"Living Room", "Kitchen", "Master Bedroom"}'),
 ('30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', 'Structural Assessment Report', '', 'done', '20000000-0000-0000-0000-000000000007', '{"Structural"}'),
@@ -54,7 +97,17 @@ INSERT INTO tasks (id, project_id, title, description, status, owner_id, tags) V
 ('30000000-0000-0000-0000-000000000016', '10000000-0000-0000-0000-000000000001', 'Furniture Delivery & Staging', '', 'pending', '20000000-0000-0000-0000-000000000012', '{"Furniture", "Living Room", "Final"}'),
 ('30000000-0000-0000-0000-000000000017', '10000000-0000-0000-0000-000000000001', 'Final Walkthrough & Handover', '', 'pending', '20000000-0000-0000-0000-000000000006', '{"Final", "Handover"}');
 
--- Dependencies
+-- ============================================================
+-- TASKS — Studio Solo
+-- ============================================================
+INSERT INTO tasks (id, project_id, title, description, status, owner_id, tags) VALUES
+('30000000-0000-0000-0000-000000000101', '10000000-0000-0000-0000-000000000002', 'Cabinet Layout & Measurements', 'Finalize cabinet dimensions and layout for the L-shaped kitchen.', 'in_progress', '20000000-0000-0000-0000-000000000102', '{"Kitchen", "Cabinetry"}'),
+('30000000-0000-0000-0000-000000000102', '10000000-0000-0000-0000-000000000002', 'Electrical Outlet Relocation', 'Move outlets to match new appliance positions and add under-cabinet LED feeds.', 'pending', '20000000-0000-0000-0000-000000000103', '{"Kitchen", "Electrical"}'),
+('30000000-0000-0000-0000-000000000103', '10000000-0000-0000-0000-000000000002', 'Countertop Material Selection', 'Choose between quartz and granite for the island and perimeter counters.', 'pending', '20000000-0000-0000-0000-000000000101', '{"Kitchen", "Materials"}');
+
+-- ============================================================
+-- DEPENDENCIES — Whitfield (same as original)
+-- ============================================================
 INSERT INTO dependencies (project_id, from_task_id, to_task_id, dependency_type) VALUES
 ('10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'blocks'),
 ('10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000003', 'blocks'),
@@ -82,17 +135,28 @@ INSERT INTO dependencies (project_id, from_task_id, to_task_id, dependency_type)
 ('10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000015', '30000000-0000-0000-0000-000000000017', 'blocks'),
 ('10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000016', '30000000-0000-0000-0000-000000000017', 'blocks');
 
--- Approvals
+-- Studio Solo dependencies
+INSERT INTO dependencies (project_id, from_task_id, to_task_id, dependency_type) VALUES
+('10000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000101', '30000000-0000-0000-0000-000000000102', 'blocks'),
+('10000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000101', '30000000-0000-0000-0000-000000000103', 'blocks');
+
+-- ============================================================
+-- APPROVALS — Whitfield (same as original)
+-- ============================================================
 INSERT INTO approvals (id, task_id, required_from, status) VALUES
 ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000008', '20000000-0000-0000-0000-000000000003', 'pending'),
 ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000014', '20000000-0000-0000-0000-000000000014', 'pending');
 
--- Changes
+-- ============================================================
+-- CHANGES — Whitfield (same as original)
+-- ============================================================
 INSERT INTO changes (id, project_id, task_id, description, proposed_by, status, reviewed_by, reviewed_at) VALUES
 ('50000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'Updated HVAC duct routing to accommodate new kitchen island placement. Requires rework of electrical conduit paths in kitchen ceiling.', '20000000-0000-0000-0000-000000000008', 'committed', '20000000-0000-0000-0000-000000000002', NOW()),
 ('50000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000006', 'Client requests switching from hardwood to polished concrete flooring in living room. Impacts furniture selection and possibly electrical floor outlet placement.', '20000000-0000-0000-0000-000000000003', 'proposed', NULL, NULL);
 
--- Alerts
+-- ============================================================
+-- ALERTS — Whitfield (same as original)
+-- ============================================================
 INSERT INTO alerts (id, stakeholder_id, change_id, message) VALUES
 ('60000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000009', '50000000-0000-0000-0000-000000000001', 'Change in MEP Systems Review affects your task: Electrical Wiring Plan.'),
 ('60000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000010', '50000000-0000-0000-0000-000000000001', 'Change in MEP Systems Review affects your task: Plumbing Rough-In Plan.'),

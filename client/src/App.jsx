@@ -15,6 +15,9 @@ import ImpactCascade from './pages/ImpactCascade';
 import PendingApprovals from './pages/PendingApprovals';
 import ProjectMemory from './pages/ProjectMemory';
 import Alerts from './pages/Alerts';
+import SignalHub from './pages/SignalHub';
+import OrganizationSettings from './pages/OrganizationSettings';
+import EventLog from './pages/EventLog';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -46,6 +49,12 @@ const AppRoutes = () => {
         <Route path="projects/:id/changes/:changeId/impact" element={<ImpactCascade />} />
         <Route path="projects/:id/approvals" element={<PendingApprovals />} />
         <Route path="projects/:id/history" element={<ProjectMemory />} />
+
+        {/* AS-06 Modular Apps & Entitlements */}
+        <Route path="signal" element={<SignalHub />} />
+        <Route path="settings/organization" element={<OrganizationSettings />} />
+        <Route path="events" element={<EventLog />} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
       <Route path="*" element={<Navigate to="/login" replace />} />
