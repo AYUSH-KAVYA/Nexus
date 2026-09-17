@@ -131,3 +131,5 @@ The demo scenario includes:
 - **2 approval gates** (Client design approval, Compliance review)
 - **2 sample changes** (1 committed with alerts, 1 proposed/pending)
 - **23 dependency edges** forming a realistic project DAG
+
+<!-- build-step -->
