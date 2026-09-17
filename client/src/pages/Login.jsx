@@ -14,6 +14,14 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const extractErrorMessage = (err, fallback) => {
+    if (typeof err === 'string') return err;
+    if (err?.response?.data?.message && typeof err.response.data.message === 'string') return err.response.data.message;
+    if (err?.response?.data?.error && typeof err.response.data.error === 'string') return err.response.data.error;
+    if (err?.message && typeof err.message === 'string') return err.message;
+    return fallback;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -23,7 +31,7 @@ const Login = () => {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to sign in. Please check your credentials.');
+      setError(extractErrorMessage(err, 'Failed to sign in. Please check your credentials.'));
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +81,7 @@ const Login = () => {
       await login(demoEmail, 'password123');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to sign in. Please check your credentials.');
+      setError(extractErrorMessage(err, 'Failed to sign in. Please check your credentials.'));
     } finally {
       setIsLoading(false);
     }

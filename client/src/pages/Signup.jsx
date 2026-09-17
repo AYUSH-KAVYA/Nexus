@@ -22,6 +22,14 @@ const Signup = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const extractErrorMessage = (err, fallback) => {
+    if (typeof err === 'string') return err;
+    if (err?.response?.data?.message && typeof err.response.data.message === 'string') return err.response.data.message;
+    if (err?.response?.data?.error && typeof err.response.data.error === 'string') return err.response.data.error;
+    if (err?.message && typeof err.message === 'string') return err.message;
+    return fallback;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -38,7 +46,7 @@ const Signup = () => {
       await signup(formData.name, formData.email, formData.password, formData.globalRole);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create account');
+      setError(extractErrorMessage(err, 'Failed to create account'));
     } finally {
       setIsLoading(false);
     }
