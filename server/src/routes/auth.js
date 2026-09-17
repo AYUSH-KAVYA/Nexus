@@ -8,9 +8,10 @@ const { authenticate } = require('../middleware/auth');
 const router = express.Router();
 
 const signToken = (userId, email, globalRole, organizationId) => {
+  const secret = process.env.JWT_SECRET || 'nexus_default_secret_jwt_key_2026';
   return jwt.sign(
     { userId, email, globalRole, organizationId },
-    process.env.JWT_SECRET,
+    secret,
     { expiresIn: '7d' }
   );
 };

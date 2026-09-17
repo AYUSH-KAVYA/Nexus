@@ -15,7 +15,8 @@ const authenticate = async (req, res, next) => {
       return next(new AppError('You are not logged in. Please log in to get access.', 401));
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || 'nexus_default_secret_jwt_key_2026';
+    const decoded = jwt.verify(token, secret);
 
     const { rows } = await pool.query(
       `SELECT u.id, u.name, u.email, u.global_role, u.organization_id,
