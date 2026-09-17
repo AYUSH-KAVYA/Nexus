@@ -77,6 +77,17 @@ export default function EventLog() {
     }
   };
 
+  const safeFormatTime = (dateStr) => {
+    try {
+      if (!dateStr) return 'just now';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return 'recently';
+      return formatDistanceToNow(d, { addSuffix: true });
+    } catch {
+      return 'recently';
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -133,7 +144,12 @@ export default function EventLog() {
       ) : (
         <div className="space-y-3">
           {events.map((event) => {
-            const payload = typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload;
+            let payload = {};
+            try {
+              payload = typeof event.payload === 'string' ? JSON.parse(event.payload) : (event.payload || {});
+            } catch {
+              payload = {};
+            }
 
             return (
               <Card 
@@ -153,7 +169,7 @@ export default function EventLog() {
 
                   <div className="flex items-center gap-1.5 text-zinc-500 font-mono text-[11px]">
                     <Clock className="w-3 h-3" />
-                    <span>{formatDistanceToNow(new Date(event.created_at), { addSuffix: true })}</span>
+                    <span>{safeFormatTime(event.created_at)}</span>
                   </div>
                 </div>
 
